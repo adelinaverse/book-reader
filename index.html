@@ -42,7 +42,7 @@
   .drop {
     border: 1px solid var(--line); border-radius: 14px;
     background: var(--paper); box-shadow: var(--shadow);
-    padding: 48px 32px; text-align: center; cursor: pointer;
+    padding: 40px 32px; text-align: center; cursor: pointer;
     transition: border-color .2s, background .2s;
   }
   .drop:hover { border-color: var(--gold-soft); }
@@ -62,6 +62,43 @@
     font-size: 13px; color: var(--ink-soft);
     text-align: center; margin-top: 18px; min-height: 18px;
   }
+
+  .library { margin-top: 34px; }
+  .library-label {
+    font-family: 'Helvetica Neue', system-ui, sans-serif;
+    text-transform: uppercase; letter-spacing: .2em;
+    font-size: 11px; color: var(--ink-soft); margin-bottom: 14px;
+  }
+  .shelf { display: flex; flex-direction: column; gap: 10px; }
+  .book {
+    display: flex; align-items: center; gap: 16px;
+    background: var(--paper); border: 1px solid var(--line);
+    border-radius: 12px; padding: 16px 18px; cursor: pointer;
+    transition: border-color .2s, transform .1s;
+  }
+  .book:hover { border-color: var(--gold-soft); }
+  .book:active { transform: scale(.995); }
+  .book .spine {
+    width: 6px; align-self: stretch; border-radius: 4px;
+    background: linear-gradient(var(--plum), var(--plum-deep)); flex: none;
+  }
+  .book .info { flex: 1; min-width: 0; }
+  .book .name {
+    font-size: 17px; color: var(--plum-deep);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .book .sub {
+    font-family: 'Helvetica Neue', system-ui, sans-serif;
+    font-size: 12px; color: var(--ink-soft); margin-top: 3px;
+  }
+  .book .bar-mini { height: 3px; background: var(--line); border-radius: 3px; margin-top: 8px; overflow: hidden; }
+  .book .bar-mini span { display: block; height: 100%; background: linear-gradient(90deg, var(--gold), var(--plum)); }
+  .book .del {
+    flex: none; border: none; background: none; cursor: pointer;
+    color: var(--ink-soft); font-size: 18px; padding: 4px 8px; border-radius: 6px;
+    font-family: 'Helvetica Neue', system-ui, sans-serif;
+  }
+  .book .del:hover { color: #a33; background: #f6e9e9; }
 
   .reader { display: none; }
   .reader.show { display: block; }
@@ -145,18 +182,25 @@
     <h1>A quiet <span class="light">reader</span></h1>
   </header>
 
-  <div class="drop" id="drop">
-    <input type="file" id="file" accept="application/pdf">
-    <div class="mark">↑</div>
-    <div class="big">Drop a PDF here, or tap to choose one</div>
-    <div class="small">Text is read aloud in natural AI voices.</div>
+  <div id="home">
+    <div class="drop" id="drop">
+      <input type="file" id="file" accept="application/pdf">
+      <div class="mark">&#8593;</div>
+      <div class="big">Drop a PDF here, or tap to choose one</div>
+      <div class="small">Your books and your place are saved in this browser.</div>
+    </div>
+    <div class="status" id="status"></div>
+
+    <div class="library" id="library" style="display:none">
+      <div class="library-label">Your books</div>
+      <div class="shelf" id="shelf"></div>
+    </div>
   </div>
-  <div class="status" id="status"></div>
 
   <div class="reader" id="reader">
     <div class="doc-title">
       <span id="docname"></span>
-      <span class="close" id="close">Choose another</span>
+      <span class="close" id="close">Back to library</span>
     </div>
     <div class="page" id="page"></div>
   </div>
@@ -167,25 +211,25 @@
     <div class="setting">
       <label for="voice">Voice</label>
       <select id="voice">
-        <optgroup label="Chirp 3 HD — most natural">
-          <option value="en-US-Chirp3-HD-Aoede">Aoede — warm female</option>
-          <option value="en-US-Chirp3-HD-Kore">Kore — soft female</option>
-          <option value="en-US-Chirp3-HD-Leda">Leda — bright female</option>
-          <option value="en-US-Chirp3-HD-Zephyr">Zephyr — gentle female</option>
-          <option value="en-US-Chirp3-HD-Charon">Charon — calm male</option>
-          <option value="en-US-Chirp3-HD-Orus">Orus — clear male</option>
-          <option value="en-US-Chirp3-HD-Fenrir">Fenrir — deep male</option>
-          <option value="en-US-Chirp3-HD-Puck">Puck — lively male</option>
+        <optgroup label="Chirp 3 HD - most natural">
+          <option value="en-US-Chirp3-HD-Aoede">Aoede - warm female</option>
+          <option value="en-US-Chirp3-HD-Kore">Kore - soft female</option>
+          <option value="en-US-Chirp3-HD-Leda">Leda - bright female</option>
+          <option value="en-US-Chirp3-HD-Zephyr">Zephyr - gentle female</option>
+          <option value="en-US-Chirp3-HD-Charon">Charon - calm male</option>
+          <option value="en-US-Chirp3-HD-Orus">Orus - clear male</option>
+          <option value="en-US-Chirp3-HD-Fenrir">Fenrir - deep male</option>
+          <option value="en-US-Chirp3-HD-Puck">Puck - lively male</option>
         </optgroup>
-        <optgroup label="Chirp 3 HD — British">
-          <option value="en-GB-Chirp3-HD-Aoede">Aoede — British female</option>
-          <option value="en-GB-Chirp3-HD-Charon">Charon — British male</option>
+        <optgroup label="Chirp 3 HD - British">
+          <option value="en-GB-Chirp3-HD-Aoede">Aoede - British female</option>
+          <option value="en-GB-Chirp3-HD-Charon">Charon - British male</option>
         </optgroup>
-        <optgroup label="Chirp 3 HD — Australian">
-          <option value="en-AU-Chirp3-HD-Aoede">Aoede — Australian female</option>
-          <option value="en-AU-Chirp3-HD-Charon">Charon — Australian male</option>
+        <optgroup label="Chirp 3 HD - Australian">
+          <option value="en-AU-Chirp3-HD-Aoede">Aoede - Australian female</option>
+          <option value="en-AU-Chirp3-HD-Charon">Charon - Australian male</option>
         </optgroup>
-        <optgroup label="Neural2 — backup">
+        <optgroup label="Neural2 - backup">
           <option value="en-US-Neural2-C">Soft female (Neural2)</option>
           <option value="en-US-Neural2-D">Calm male (Neural2)</option>
         </optgroup>
@@ -194,7 +238,7 @@
     <div class="setting">
       <label for="rate">Speed</label>
       <input type="range" id="rate" min="0.5" max="1.6" step="0.05" value="1">
-      <span id="ratev" style="font-size:12px;color:var(--ink-soft);width:30px">1.0×</span>
+      <span id="ratev" style="font-size:12px;color:var(--ink-soft);width:30px">1.0x</span>
     </div>
     <div class="setting">
       <label for="pitch">Pitch</label>
@@ -202,12 +246,12 @@
     </div>
   </div>
   <div class="bar-inner">
-    <button class="stepbtn" id="prev" title="Previous">◀</button>
-    <button class="play" id="play" title="Play" disabled>▶</button>
-    <button class="stepbtn" id="next" title="Next">▶</button>
+    <button class="stepbtn" id="prev" title="Previous">&#9664;</button>
+    <button class="play" id="play" title="Play" disabled>&#9654;</button>
+    <button class="stepbtn" id="next" title="Next">&#9654;</button>
     <div class="meta">
       <div class="progress"><span id="fill"></span></div>
-      <div class="counter" id="counter">—</div>
+      <div class="counter" id="counter">-</div>
     </div>
   </div>
 </div>
@@ -218,23 +262,92 @@
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-// Backend endpoint. Because the frontend and function live on the same Vercel
-// project, a relative path works — no domain to hard-code.
 const API = '/api/speak';
-
 const $ = id => document.getElementById(id);
+
+/* ============================================================
+   Storage - IndexedDB holds books; localStorage holds settings.
+   A "book" record: { id, name, sentences[], idx, added }
+   ============================================================ */
+const DB_NAME = 'read-aloud';
+const STORE = 'books';
+let db = null;
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, 1);
+    req.onupgradeneeded = () => {
+      const d = req.result;
+      if (!d.objectStoreNames.contains(STORE)) {
+        d.createObjectStore(STORE, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = () => { db = req.result; resolve(db); };
+    req.onerror = () => reject(req.error);
+  });
+}
+
+function dbPut(book) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).put(book);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+function dbGet(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const r = tx.objectStore(STORE).get(id);
+    r.onsuccess = () => resolve(r.result);
+    r.onerror = () => reject(r.error);
+  });
+}
+function dbAll() {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readonly');
+    const r = tx.objectStore(STORE).getAll();
+    r.onsuccess = () => resolve(r.result || []);
+    r.onerror = () => reject(r.error);
+  });
+}
+function dbDelete(id) {
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE, 'readwrite');
+    tx.objectStore(STORE).delete(id);
+    tx.oncomplete = resolve;
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+function loadSettings() {
+  try {
+    const s = JSON.parse(localStorage.getItem('read-aloud-settings') || '{}');
+    if (s.voice) $('voice').value = s.voice;
+    if (s.rate) { $('rate').value = s.rate; $('ratev').textContent = parseFloat(s.rate).toFixed(1) + 'x'; }
+    if (s.pitch !== undefined) $('pitch').value = s.pitch;
+  } catch (e) {}
+}
+function saveSettings() {
+  localStorage.setItem('read-aloud-settings', JSON.stringify({
+    voice: $('voice').value,
+    rate: $('rate').value,
+    pitch: $('pitch').value,
+  }));
+}
+
 let sentences = [];
 let idx = 0;
+let currentId = null;
 let playing = false;
 let fetching = false;
-const cache = new Map();          // idx -> audio data URL
+const cache = new Map();
 const player = $('player');
 
 const drop = $('drop'), fileInput = $('file'), status = $('status');
-const reader = $('reader'), page = $('page'), bar = $('bar');
+const home = $('home'), reader = $('reader'), page = $('page'), bar = $('bar');
 const playBtn = $('play'), counter = $('counter'), fill = $('fill');
 
-/* ---------- File handling ---------- */
 drop.addEventListener('click', () => fileInput.click());
 drop.addEventListener('dragover', e => { e.preventDefault(); drop.classList.add('drag'); });
 drop.addEventListener('dragleave', () => drop.classList.remove('drag'));
@@ -247,29 +360,31 @@ fileInput.addEventListener('change', e => { if (e.target.files[0]) loadPDF(e.tar
 async function loadPDF(file) {
   if (file.type !== 'application/pdf') { status.textContent = 'That is not a PDF.'; return; }
   stop();
-  status.textContent = 'Reading the file…';
+  status.textContent = 'Reading the file...';
   try {
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
     let full = '';
     for (let p = 1; p <= pdf.numPages; p++) {
-      status.textContent = `Extracting text… page ${p} of ${pdf.numPages}`;
+      status.textContent = 'Extracting text... page ' + p + ' of ' + pdf.numPages;
       const pg = await pdf.getPage(p);
       const content = await pg.getTextContent();
       full += content.items.map(i => i.str).join(' ') + '\n\n';
     }
     const text = cleanup(full);
     if (!text.trim()) { status.textContent = 'No selectable text found. This PDF may be scanned images.'; return; }
-    sentences = splitSentences(text);
-    idx = 0; cache.clear();
-    $('docname').textContent = file.name;
-    renderPage();
+
+    const book = {
+      id: 'b_' + Date.now(),
+      name: file.name.replace(/\.pdf$/i, ''),
+      sentences: splitSentences(text),
+      idx: 0,
+      added: Date.now(),
+    };
+    await dbPut(book);
     status.textContent = '';
-    drop.style.display = 'none';
-    reader.classList.add('show');
-    bar.classList.add('show');
-    playBtn.disabled = false;
-    updateCounter();
+    openBook(book);
+    refreshLibrary();
   } catch (err) {
     status.textContent = 'Could not read that PDF. It may be encrypted or damaged.';
     console.error(err);
@@ -280,14 +395,12 @@ function cleanup(t) {
   return t.replace(/-\s*\n\s*/g, '').replace(/\s+/g, ' ').replace(/\s([.,;:!?])/g, '$1').trim();
 }
 
-// Split into readable chunks, each safely under Google's 5000-char cap.
 function splitSentences(t) {
   const raw = t.match(/[^.!?]+[.!?]+["')\]]?|\S[^.!?]*$/g) || [t];
   const out = [];
   raw.forEach(s => {
     s = s.trim();
     if (!s) return;
-    // hard-split anything unusually long (e.g. lists with no periods)
     while (s.length > 700) {
       let cut = s.lastIndexOf(' ', 700);
       if (cut < 300) cut = 700;
@@ -299,7 +412,65 @@ function splitSentences(t) {
   return out;
 }
 
-/* ---------- Rendering ---------- */
+async function refreshLibrary() {
+  const books = (await dbAll()).sort((a, b) => b.added - a.added);
+  const shelf = $('shelf'), lib = $('library');
+  if (!books.length) { lib.style.display = 'none'; return; }
+  lib.style.display = 'block';
+  shelf.innerHTML = '';
+  books.forEach(book => {
+    const pct = Math.round((book.idx / Math.max(1, book.sentences.length - 1)) * 100);
+    const row = document.createElement('div');
+    row.className = 'book';
+    row.innerHTML =
+      '<div class="spine"></div>' +
+      '<div class="info">' +
+        '<div class="name"></div>' +
+        '<div class="sub">' + pct + '% through &middot; ' + book.sentences.length + ' sentences</div>' +
+        '<div class="bar-mini"><span style="width:' + pct + '%"></span></div>' +
+      '</div>' +
+      '<button class="del" title="Remove">&times;</button>';
+    row.querySelector('.name').textContent = book.name;
+    row.querySelector('.info').addEventListener('click', () => openBook(book));
+    row.querySelector('.spine').addEventListener('click', () => openBook(book));
+    row.querySelector('.del').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      if (confirm('Remove "' + book.name + '" from your library?')) {
+        await dbDelete(book.id);
+        refreshLibrary();
+      }
+    });
+    shelf.appendChild(row);
+  });
+}
+
+function openBook(book) {
+  stop();
+  cache.clear();
+  currentId = book.id;
+  sentences = book.sentences;
+  idx = book.idx || 0;
+  $('docname').textContent = book.name;
+  renderPage();
+  home.style.display = 'none';
+  reader.classList.add('show');
+  bar.classList.add('show');
+  playBtn.disabled = false;
+  updateCounter();
+  const el = page.querySelector('[data-i="' + idx + '"]');
+  if (el) el.scrollIntoView({ block: 'center' });
+}
+
+let saveTimer = null;
+function saveProgress() {
+  if (!currentId) return;
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async () => {
+    const book = await dbGet(currentId);
+    if (book) { book.idx = idx; await dbPut(book); }
+  }, 400);
+}
+
 function renderPage() {
   page.innerHTML = '';
   sentences.forEach((s, i) => {
@@ -307,7 +478,7 @@ function renderPage() {
     span.className = 'sent';
     span.textContent = s + ' ';
     span.dataset.i = i;
-    span.addEventListener('click', () => { idx = i; updateCounter(); playing ? playCurrent() : highlight(); });
+    span.addEventListener('click', () => { idx = i; updateCounter(); saveProgress(); playing ? playCurrent() : highlight(); });
     page.appendChild(span);
   });
   highlight();
@@ -315,18 +486,15 @@ function renderPage() {
 
 function highlight() {
   document.querySelectorAll('.sent').forEach(el => el.classList.remove('active'));
-  const el = page.querySelector(`[data-i="${idx}"]`);
+  const el = page.querySelector('[data-i="' + idx + '"]');
   if (el) { el.classList.add('active'); el.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
 
 function updateCounter() {
-  counter.textContent = fetching
-    ? 'Loading voice…'
-    : `Sentence ${idx + 1} of ${sentences.length}`;
+  counter.textContent = fetching ? 'Loading voice...' : ('Sentence ' + (idx + 1) + ' of ' + sentences.length);
   fill.style.width = (idx / Math.max(1, sentences.length - 1) * 100) + '%';
 }
 
-/* ---------- Audio via backend ---------- */
 async function getAudio(i) {
   if (cache.has(i)) return cache.get(i);
   const res = await fetch(API, {
@@ -351,17 +519,17 @@ async function getAudio(i) {
 
 async function playCurrent() {
   if (idx >= sentences.length) { stop(); return; }
-  fetching = true; updateCounter(); highlight();
+  fetching = true; updateCounter(); highlight(); saveProgress();
   try {
     const url = await getAudio(idx);
     fetching = false; updateCounter();
-    if (!playing) return;          // user paused while it loaded
+    if (!playing) return;
     player.src = url;
     await player.play();
-    prefetchNext();                // warm up the following sentence
+    prefetchNext();
   } catch (err) {
     fetching = false;
-    playing = false; playBtn.textContent = '▶';
+    playing = false; playBtn.textContent = '\u25B6';
     status.textContent = err.message;
     counter.textContent = 'Stopped: ' + err.message;
   }
@@ -369,52 +537,70 @@ async function playCurrent() {
 
 function prefetchNext() {
   const n = idx + 1;
-  if (n < sentences.length && !cache.has(n)) {
-    getAudio(n).catch(() => {});   // silent; just caching ahead
-  }
+  if (n < sentences.length && !cache.has(n)) getAudio(n).catch(() => {});
 }
 
 player.addEventListener('ended', () => {
   if (!playing) return;
   idx++;
+  saveProgress();
   if (idx < sentences.length) { updateCounter(); playCurrent(); }
   else stop();
 });
 
 function play() {
   if (!sentences.length) return;
-  playing = true; playBtn.textContent = '❚❚'; playBtn.title = 'Pause';
+  playing = true; playBtn.textContent = '\u275A\u275A'; playBtn.title = 'Pause';
   playCurrent();
 }
-function pause() {
-  playing = false; playBtn.textContent = '▶'; playBtn.title = 'Play';
-  player.pause();
-}
-function stop() {
-  playing = false; playBtn.textContent = '▶';
-  player.pause();
-}
+function pause() { playing = false; playBtn.textContent = '\u25B6'; playBtn.title = 'Play'; player.pause(); }
+function stop() { playing = false; playBtn.textContent = '\u25B6'; player.pause(); }
 
 playBtn.addEventListener('click', () => playing ? pause() : play());
-$('prev').addEventListener('click', () => { idx = Math.max(0, idx - 1); updateCounter(); playing ? playCurrent() : highlight(); });
-$('next').addEventListener('click', () => { idx = Math.min(sentences.length - 1, idx + 1); updateCounter(); playing ? playCurrent() : highlight(); });
+$('prev').addEventListener('click', () => { idx = Math.max(0, idx - 1); updateCounter(); saveProgress(); playing ? playCurrent() : highlight(); });
+$('next').addEventListener('click', () => { idx = Math.min(sentences.length - 1, idx + 1); updateCounter(); saveProgress(); playing ? playCurrent() : highlight(); });
 
-$('rate').addEventListener('input', e => { $('ratev').textContent = parseFloat(e.target.value).toFixed(1) + '×'; cache.clear(); });
-$('pitch').addEventListener('input', () => cache.clear());
-$('voice').addEventListener('change', () => { cache.clear(); if (playing) playCurrent(); });
+$('rate').addEventListener('input', e => { $('ratev').textContent = parseFloat(e.target.value).toFixed(1) + 'x'; cache.clear(); saveSettings(); });
+$('pitch').addEventListener('input', () => { cache.clear(); saveSettings(); });
+$('voice').addEventListener('change', () => { cache.clear(); saveSettings(); if (playing) playCurrent(); });
 
 $('close').addEventListener('click', () => {
-  stop(); cache.clear();
+  stop(); saveProgress(); cache.clear();
   reader.classList.remove('show'); bar.classList.remove('show');
-  drop.style.display = 'block'; fileInput.value = ''; status.textContent = '';
+  home.style.display = 'block';
   playBtn.disabled = true;
+  currentId = null;
+  fileInput.value = '';
+  status.textContent = '';
+  refreshLibrary();
 });
+
+window.addEventListener('beforeunload', () => {
+  if (currentId && db) {
+    const tx = db.transaction(STORE, 'readwrite');
+    const store = tx.objectStore(STORE);
+    const r = store.get(currentId);
+    r.onsuccess = () => { const b = r.result; if (b) { b.idx = idx; store.put(b); } };
+  }
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden) saveProgress(); });
 
 document.addEventListener('keydown', e => {
   if (e.code === 'Space' && bar.classList.contains('show')) {
     e.preventDefault(); playing ? pause() : play();
   }
 });
+
+(async function init() {
+  loadSettings();
+  try {
+    await openDB();
+    await refreshLibrary();
+  } catch (err) {
+    status.textContent = 'Could not open local storage. Your books may not save in this browser mode.';
+    console.error(err);
+  }
+})();
 </script>
 </body>
 </html>
